@@ -2,7 +2,7 @@
 //bootstrap,DateTimePicker plugin needed to work .
 //bootstrap DateTimePicker plugin : https://eonasdan.github.io/bootstrap-datetimepicker/
 // </> with ♬♫ by rusith
-var DateTimePicker=React.createClass({displayName: "DateTimePicker",
+var DateTimePicker=React.createClass({
   propTypes:{
     "inputId":React.PropTypes.string,
     "inputName":React.PropTypes.string,
@@ -13,9 +13,9 @@ var DateTimePicker=React.createClass({displayName: "DateTimePicker",
     "disabledDates":React.PropTypes.any,
     "icons":React.PropTypes.any,
     "viewMode":React.PropTypes.any,
-    "daysOfWeekDisabled":React.PropTypes.any
+    "daysOfWeekDisabled":React.PropTypes.any,
+    "placeholder":React.PropTypes.string
   },
-  //_____________________icon control____________________
   _getDTPO:function(){
     return $(this.refs.picker).data("DateTimePicker");
   },
@@ -38,9 +38,6 @@ var DateTimePicker=React.createClass({displayName: "DateTimePicker",
       this.setState(st);
     }
   },
-  //_______________end of icon control____________________
-
-  //_______________input identity control___________________________
   inputId:function(newID){
     var st=this.state;
     if(newID){
@@ -59,8 +56,6 @@ var DateTimePicker=React.createClass({displayName: "DateTimePicker",
     }
     return this.st.inputName;
   },
-  //_______________end of input identity control___________________________
-  //_______________input value control_____________________________________
   value:function(newValue){
     if(newValue){
       $(this.refs.input).val(newValue);
@@ -68,8 +63,6 @@ var DateTimePicker=React.createClass({displayName: "DateTimePicker",
     }
     return $(this.refs.input).val();
   },
-  //_______________end of input value control______________________________
-  //_______________API controls____________________________________________
   destroy:function(){
     this._getDTPO().destroy();
   },
@@ -98,6 +91,14 @@ var DateTimePicker=React.createClass({displayName: "DateTimePicker",
       return DTP.date();
     }
 
+  },
+  dateUTC:function(){
+    var date=this.date();
+    var nDate=date.toDate();
+    return moment.utc(nDate);
+  },
+  dateUTCM:function(){
+    return this.dateUTC().valueOf();
   },
   disabledDates:function(newDisabledDates){
     var DTP=this._getDTPO();
@@ -409,39 +410,52 @@ var DateTimePicker=React.createClass({displayName: "DateTimePicker",
       return DTP.tooltips();
     }
   },
-  //_______________end of API controls_____________________________________
+  placeholder:function(PH)
+  {
+    if(!PH)
+    {
+      return this.state.placeholder;
+    }
+    else
+    {
+      var st=this.state;
+      st.placeholder=PH;
+      this.setState(PH);
+    }
+  },
   getInitialState:function(){
     var props=this.props;
     var newState=$.extend({},{
       'noIcon':props.noIcon,
       'inputId':props.inputId?props.inputId:undefined,
-      'inputName':props.inputName?props.inputName:undefined
+      'inputName':props.inputName?props.inputName:undefined,
+      'placeholder':props.placeholder
     });
     return newState;
   },
   componentDidMount:function(){
     var P=this.props;
     var settings=$.extend({}, {
-    "locale": P.locale ? P.locale : undefined,
-    "format":P.format ? P.format :undefined,
-    "defaultDate":P.defaultDate ? P.defaultDate:undefined,
-    "disabledDates":P.disabledDates ? P.disabledDates:undefined,
-    "icons":P.icons ? P.icons:undefined,
-    "viewMode":P.viewMode?P.viewMode:undefined,
-    "daysOfWeekDisabled":P.daysOfWeekDisabled?P.daysOfWeekDisabled:undefined
+      "locale": P.locale ? P.locale : undefined,
+      "format":P.format ? P.format :undefined,
+      "defaultDate":P.defaultDate ? P.defaultDate:undefined,
+      "disabledDates":P.disabledDates ? P.disabledDates:undefined,
+      "icons":P.icons ? P.icons:undefined,
+      "viewMode":P.viewMode?P.viewMode:undefined,
+      "daysOfWeekDisabled":P.daysOfWeekDisabled?P.daysOfWeekDisabled:undefined
     });
     $(this.refs.picker).datetimepicker(settings);
   },
   render:function(){
     var st=this.state;
     return(
-      React.createElement("div", {className: "input-group date", ref: "picker"}, 
-         React.createElement("input", {ref: "input", type: "text", id: st.inputId, name: st.inputName, className: "form-control"}), 
-         (this.state.noIcon?"":
-           React.createElement("span", {className: "input-group-addon"}, 
-              React.createElement("span", {className: "glyphicon glyphicon-calendar"})
-          ))
-     )
+      <div className='input-group date' ref="picker">
+         <input ref="input" placeholder={st.placeholder} type='text' id={st.inputId} name={st.inputName} className="form-control"/>
+         {(this.state.noIcon?"":
+           <span className="input-group-addon">
+              <span className="glyphicon glyphicon-calendar"></span>
+          </span>)}
+     </div>
     )
   }
 });
